@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/models/movie.dart';
-import 'package:frontend/pages/seats_page.dart';
+import 'package:frontend/models.dart';
+import 'package:frontend/pages/seat_selection_page.dart';
 
 class MovieCard extends StatefulWidget {
   final Movie movie;
@@ -14,7 +14,7 @@ class MovieCard extends StatefulWidget {
 
 class _MovieCardState extends State<MovieCard> {
   bool showTimetable = false;
-  List<String>? showTimes;
+  List<DateTime>? showTimes;
 
   @override
   Widget build(BuildContext context) {
@@ -36,14 +36,18 @@ class _MovieCardState extends State<MovieCard> {
                   itemCount: showTimes?.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(showTimes![index]),
+                      title: Text(showTimes![index].toString()),
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SeatsPage(
-                              movieTitle: widget.movie.title,
-                              showTime: showTimes![index],
+                            builder: (context) => SeatSelectionPage(
+                              movieShow: MovieShow(
+                                uuid: 'uuid',
+                                movie: widget.movie,
+                                cinemaRoomUuid: 'uuid',
+                                showTime: DateTime.now(),
+                              ),
                             ),
                           ),
                         );
@@ -51,7 +55,17 @@ class _MovieCardState extends State<MovieCard> {
                     );
                   },
                 ),
+              )
+            else ...[
+              Expanded(
+                child: Text('Duration: ${widget.movie.duration}',
+                    style: const TextStyle(fontSize: 16)),
               ),
+            ],
+            Text('Rating: ${widget.movie.rating}',
+                style: const TextStyle(fontSize: 16)),
+            Text('Genres: ${widget.movie.genres}',
+                style: const TextStyle(fontSize: 16)),
           ],
         ),
       ),
@@ -59,12 +73,10 @@ class _MovieCardState extends State<MovieCard> {
   }
 }
 
-List<String> getShowTimes() {
+List<DateTime> getShowTimes() {
   return [
-    '10:00 AM',
-    '1:00 PM',
-    '4:00 PM',
-    '7:00 PM',
-    '10:00 PM',
+    DateTime.now().add(const Duration(hours: 1)),
+    DateTime.now().add(const Duration(hours: 2)),
+    DateTime.now().add(const Duration(hours: 3)),
   ];
 }
