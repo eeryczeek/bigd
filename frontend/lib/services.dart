@@ -21,22 +21,16 @@ Future<List<Movie>> fetchMovies() async {
   }
 }
 
-Future<List<MovieShow>> fetchMovieShows() async {
+Future<List<MovieShow>> fetchMovieShows({required String movieUuid}) async {
   final response =
-      await http.get(Uri.parse('https://cinema_rooms/1/movie_shows'));
+      await http.get(Uri.parse('https://movies/$movieUuid/movie_shows'));
 
   if (response.statusCode == 200) {
     final List<dynamic> data = jsonDecode(response.body);
     return data
         .map((movieShow) => MovieShow(
               uuid: movieShow['uuid'],
-              movie: Movie(
-                uuid: movieShow['movie']['uuid'],
-                title: movieShow['movie']['title'],
-                duration: movieShow['movie']['duration'],
-                genres: List<String>.from(movieShow['movie']['genres']),
-                rating: movieShow['movie']['rating'],
-              ),
+              movie: movieShow['movie'],
               cinemaRoomUuid: movieShow['cinema_room_uuid'],
               showTime: DateTime.parse(movieShow['show_time']),
             ))

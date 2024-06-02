@@ -1,5 +1,5 @@
 class Movie {
-  final uuid;
+  final String uuid;
   final String title;
   final int duration;
   final List<String> genres;
@@ -15,7 +15,7 @@ class Movie {
 }
 
 class Seat {
-  final uuid;
+  final String uuid;
   final int X;
   final int Y;
   final bool isReserved;
@@ -28,7 +28,7 @@ class Seat {
 }
 
 class CinemaRoom {
-  final uuid;
+  final String uuid;
   final String name;
   final List<Seat> seats;
 
@@ -40,9 +40,9 @@ class CinemaRoom {
 }
 
 class MovieShow {
-  final uuid;
+  final String uuid;
   final Movie movie;
-  final cinemaRoomUuid;
+  final String cinemaRoomUuid;
   final DateTime showTime;
 
   MovieShow({

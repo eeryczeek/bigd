@@ -1,64 +1,71 @@
-from fastapi import FastAPI
-from cassandra.cluster import Cluster
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException
+from uuid import UUID, uuid4
 from typing import List
+from datetime import datetime
+
+
+from models import Movie, CinemaRoom, MovieShow, SeatReservation
+from database import session
 
 app = FastAPI()
-cluster = Cluster()
-session = cluster.connect("test_keyspace")
 
-class Movie(BaseModel):
-    title: str
-    duration: int
-    genres: List[str]
-    rating: float
 
-class Time(BaseModel):
-    time: str
+@app.post("/movies/", response_model=Movie)
+async def create_movie(movie: Movie):
+    query = "INSERT INTO movies (uuid, title, duration, genres, rating) VALUES (?, ?, ?, ?, ?)"
+    session.execute(query, (movie.uuid, movie.title,
+                    movie.duration, movie.genres, movie.rating))
+    return movie
 
-class Seat(BaseModel):
-    seat: str
 
-class SeatList(BaseModel):
-    seats: List[str]
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-@app.get("/movies")
-def read_movies():
+@app.get("/movies/", response_model=List[Movie])
+async def read_movies():
     rows = session.execute("SELECT * FROM movies")
-    return {"movies": [row.movie for row in rows]}
+    movies = [Movie(**row._asdict()) for row in rows]
+    return movies
 
-@app.post("/movies")
-def create_movie(movie: str):
-    session.execute(f"INSERT INTO movies (movie) VALUES ('{movie}')")
-    return {"movie": movie}
 
-@app.get("/movies/{movie_id}/timetable")
-def read_movie_timetable(movie_id: int):
-    rows = session.execute(f"SELECT * FROM timetable WHERE movie_id={movie_id}")
-    return {"timetable": [row.time for row in rows]}
+@app.post("/cinema_rooms/", response_model=CinemaRoom)
+async def create_cinema_room(cinema_room: CinemaRoom):
+    query = "INSERT INTO cinema_rooms (uuid, name, seats) VALUES (?, ?, ?)"
+    session.execute(
+        query, (cinema_room.uuid, cinema_room.name, cinema_room.seats))
+    return cinema_room
 
-@app.post("/movies/{movie_id}/timetable")
-def create_movie_timetable(movie_id: int, time: str):
-    session.execute(f"INSERT INTO timetable (movie_id, time) VALUES ({movie_id}, '{time}')")
-    return {"time": time}
 
-@app.get("/movies/{movie_id}/timetable/{time}/seats")
-def read_movie_timetable_seats(movie_id: int, time: str):
-    rows = session.execute(f"SELECT * FROM seats WHERE movie_id={movie_id} AND time='{time}'")
-    return {"seats": [row.seat for row in rows]}
+@app.get("/cinema_rooms/", response_model=List[CinemaRoom])
+async def read_cinema_rooms():
+    rows = session.execute("SELECT * FROM cinema_rooms")
+    cinema_rooms = [CinemaRoom(**row._asdict()) for row in rows]
+    return cinema_rooms
 
-@app.post("/movies/{movie_id}/timetable/{time}/seats")
-def create_movie_timetable_seats(movie_id: int, time: str, seat: str):
-    session.execute(f"INSERT INTO seats (movie_id, time, seat) VALUES ({movie_id}, '{time}', '{seat}')")
-    return {"seat": seat}
 
-@app.put("/movies/{movie_id}/timetable/{time}/seats")
-def reserve_seats(movie_id: int, time: str, seats: SeatList):
-    for seat in seats:
-        session.execute(f"UPDATE seats SET reserved=true WHERE movie_id={movie_id} AND time='{time}' AND seat='{seat}'")
-    return {"seats": seats}
+@app.post("/movie_shows/", response_model=MovieShow)
+async def create_movie_show(movie_show: MovieShow):
+    query = "INSERT INTO movie_shows (uuid, movie_uuid, cinema_room_uuid, show_time) VALUES (?, ?, ?, ?)"
+    session.execute(query, (movie_show.uuid, movie_show.movie_uuid,
+                    movie_show.cinema_room_uuid, movie_show.show_time))
+    return movie_show
 
+
+@app.get("/movie_shows/", response_model=List[MovieShow])
+async def read_movie_shows():
+    rows = session.execute("SELECT * FROM movie_shows")
+    movie_shows = [MovieShow(**row._asdict()) for row in rows]
+    return movie_shows
+
+
+@app.post("/seat_reservations/", response_model=SeatReservation)
+async def reserve_seat(seat_reservation: SeatReservation):
+    query = "INSERT INTO seat_reservations (cinema_room_uuid, show_time, seat_uuid, user_id) VALUES (?, ?, ?, ?)"
+    session.execute(query, (seat_reservation.cinema_room_uuid, seat_reservation.show_time,
+                    seat_reservation.seat_uuid, seat_reservation.user_id))
+    return seat_reservation
+
+
+@app.get("/seat_reservations/", response_model=List[SeatReservation])
+async def read_seat_reservations(cinema_room_uuid: UUID, show_time: datetime):
+    query = "SELECT * FROM seat_reservations WHERE cinema_room_uuid = ? AND show_time = ?"
+    rows = session.execute(query, (cinema_room_uuid, show_time))
+    seat_reservations = [SeatReservation(**row._asdict()) for row in rows]
+    return seat_reservations
