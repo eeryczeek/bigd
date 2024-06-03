@@ -1,94 +1,67 @@
--- Create the keyspace
-CREATE KEYSPACE IF NOT EXISTS cinema_keyspace WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 2};
+-- Keyspace creation
+CREATE KEYSPACE cinema
+WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 3};
 
--- Use the keyspace
-USE cinema_keyspace;
+-- Users table
+CREATE TABLE cinema.users (
+    user_id UUID PRIMARY KEY,
+    name TEXT,
+    email TEXT
+);
+CREATE INDEX ON cinema.users(email);
 
--- Create movies table
-CREATE TABLE IF NOT EXISTS movies (
-    uuid UUID PRIMARY KEY,
+-- Movies table
+CREATE TABLE cinema.movies (
+    movie_id UUID,
     title TEXT,
     duration INT,
     genres LIST<TEXT>,
-    rating DOUBLE
+    rating FLOAT,
+    PRIMARY KEY (movie_id, title)
+) WITH CLUSTERING ORDER BY (title ASC);
+CREATE INDEX ON cinema.movies(title);
+
+-- Cinema Rooms table
+CREATE TABLE cinema.cinema_rooms (
+    room_id UUID PRIMARY KEY,
+    name TEXT
 );
 
--- Create a custom type for seats
-CREATE TYPE IF NOT EXISTS seat (
-    uuid UUID,
+-- Seats table
+CREATE TABLE cinema.seats (
+    seat_id UUID,
+    room_id UUID,
     x INT,
-    y INT
+    y INT,
+    PRIMARY KEY (room_id, seat_id)
 );
 
--- Create cinema rooms table
-CREATE TABLE IF NOT EXISTS cinema_rooms (
-    uuid UUID PRIMARY KEY,
-    name TEXT,
-    seats LIST<FROZEN<seat>>
-);
-
--- Create movie shows table
-CREATE TABLE IF NOT EXISTS movie_shows (
-    uuid UUID PRIMARY KEY,
-    movie_uuid UUID,
-    cinema_room_uuid UUID,
-    show_time TIMESTAMP
-);
-
--- Create seat reservations table
-CREATE TABLE IF NOT EXISTS seat_reservations (
-    cinema_room_uuid UUID,
+-- Shows table
+CREATE TABLE cinema.movie_shows (
+    show_id UUID,
+    movie_id UUID,
+    cinema_room_id UUID,
     show_time TIMESTAMP,
-    seat_uuid UUID,
+    PRIMARY KEY (show_id, show_time)
+) WITH CLUSTERING ORDER BY (show_time ASC);
+CREATE INDEX ON cinema.movie_shows(movie_id);
+
+CREATE TABLE cinema.seats_by_show (
+    show_id UUID,
+    seat_id UUID,
+    room_id UUID,
+    x INT,
+    y INT,
+    available BOOLEAN,
+    PRIMARY KEY (show_id, seat_id)
+);
+
+-- Reservations table
+CREATE TABLE cinema.seat_reservations (
+    cinema_room_id UUID,
+    show_id UUID,
+    seat_id UUID,
     user_id UUID,
-    PRIMARY KEY ((cinema_room_uuid, show_time), seat_uuid)
+    PRIMARY KEY ((show_id, seat_id))
 );
-
--- Insert test data into movies table
-INSERT INTO movies (uuid, title, duration, genres, rating) VALUES (uuid(), 'Inception', 148, ['Action', 'Sci-Fi'], 8.8);
-INSERT INTO movies (uuid, title, duration, genres, rating) VALUES (uuid(), 'The Matrix', 136, ['Action', 'Sci-Fi'], 8.7);
-INSERT INTO movies (uuid, title, duration, genres, rating) VALUES (uuid(), 'Interstellar', 169, ['Adventure', 'Drama', 'Sci-Fi'], 8.6);
-
--- Insert test data into cinema rooms table
-INSERT INTO cinema_rooms (uuid, name, seats) VALUES (
-    uuid(), 
-    'Room 1', 
-    [
-        {uuid: uuid(), x: 1, y: 1}, 
-        {uuid: uuid(), x: 1, y: 2}, 
-        {uuid: uuid(), x: 1, y: 3}, 
-        {uuid: uuid(), x: 2, y: 1}, 
-        {uuid: uuid(), x: 2, y: 2}
-    ]
-);
-
-INSERT INTO cinema_rooms (uuid, name, seats) VALUES (
-    uuid(), 
-    'Room 2', 
-    [
-        {uuid: uuid(), x: 1, y: 1}, 
-        {uuid: uuid(), x: 1, y: 2}, 
-        {uuid: uuid(), x: 1, y: 3}, 
-        {uuid: uuid(), x: 2, y: 1}, 
-        {uuid: uuid(), x: 2, y: 2}
-    ]
-);
-
--- Insert test data into movie shows table
-INSERT INTO movie_shows (uuid, movie_uuid, cinema_room_uuid, show_time) VALUES (uuid(), (SELECT uuid FROM movies WHERE title = 'Inception' LIMIT 1), (SELECT uuid FROM cinema_rooms WHERE name = 'Room 1' LIMIT 1), '2024-06-01T18:30:00Z');
-INSERT INTO movie_shows (uuid, movie_uuid, cinema_room_uuid, show_time) VALUES (uuid(), (SELECT uuid FROM movies WHERE title = 'The Matrix' LIMIT 1), (SELECT uuid FROM cinema_rooms WHERE name = 'Room 2' LIMIT 1), '2024-06-01T20:30:00Z');
-
--- Insert test data into seat reservations table
-INSERT INTO seat_reservations (cinema_room_uuid, show_time, seat_uuid, user_id) VALUES (
-    (SELECT uuid FROM cinema_rooms WHERE name = 'Room 1' LIMIT 1), 
-    '2024-06-01T18:30:00Z', 
-    (SELECT seat[0].uuid FROM cinema_rooms WHERE name = 'Room 1' LIMIT 1), 
-    uuid()
-);
-
-INSERT INTO seat_reservations (cinema_room_uuid, show_time, seat_uuid, user_id) VALUES (
-    (SELECT uuid FROM cinema_rooms WHERE name = 'Room 2' LIMIT 1), 
-    '2024-06-01T20:30:00Z', 
-    (SELECT seat[1].uuid FROM cinema_rooms WHERE name = 'Room 2' LIMIT 1), 
-    uuid()
-);
+CREATE INDEX ON cinema.seat_reservations(user_id);
