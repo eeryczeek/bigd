@@ -5,8 +5,6 @@ from datetime import datetime
 
 
 class User(BaseModel):
-    uuid: UUID
-    name: str
     email: str
 
 
@@ -19,7 +17,6 @@ class Movie(BaseModel):
 
 
 class Seat(BaseModel):
-    uuid: UUID
     x: int
     y: int
     is_reserved: bool | None
@@ -33,9 +30,8 @@ class CinemaRoom(BaseModel):
 
 class MovieShow(BaseModel):
     uuid: UUID
-    movie_uuid: UUID
-    cinema_room_uuid: UUID
-    room_name: str
+    movie: str
+    room: str
     seats: List[Seat]
     show_time: datetime
 
