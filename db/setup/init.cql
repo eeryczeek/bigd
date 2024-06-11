@@ -1,17 +1,16 @@
 -- Keyspace creation
 CREATE KEYSPACE cinema
-WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 3};
+WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
 
 -- Movies table
 CREATE TABLE cinema.movies (
-    title TEXT,
+    title TEXT PRIMARY KEY,
     duration INT,
     genres LIST<TEXT>,
-    rating FLOAT,
-    PRIMARY KEY (title, rating)
-) WITH CLUSTERING ORDER BY (rating DESC);
+    rating FLOAT
+);
 
-CREATE TYPE seat (
+CREATE TYPE cinema.seat (
     x INT,
     y INT,
     is_reserved BOOLEAN
@@ -20,7 +19,7 @@ CREATE TYPE seat (
 -- Cinema Rooms table
 CREATE TABLE cinema.cinema_rooms (
     name TEXT PRIMARY KEY,
-    seats LIST<seat>
+    seats LIST<frozen<seat>>
 );
 
 -- Shows table
@@ -41,16 +40,16 @@ CREATE TABLE cinema.movie_shows_by_id (
 
 CREATE TABLE cinema.seats_by_show (
     show_id UUID,
-    seat seat,
+    seat frozen<seat>,
     PRIMARY KEY (show_id, seat)
 );
 
 -- Reservations table
 CREATE TABLE cinema.seat_reservations (
     show_id UUID,
-    seat seat,
+    seat frozen<seat>,
     user_mail TEXT,
-    PRIMARY KEY ((show_id, seat), mail)
+    PRIMARY KEY (show_id, seat)
 );
 
 CREATE TABLE cinema.reservations_by_user (
