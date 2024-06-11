@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:frontend/models.dart';
 import 'package:frontend/pages/seat_selection_page.dart';
 import 'package:frontend/services.dart';

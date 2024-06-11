@@ -3,12 +3,11 @@ import 'package:frontend/models.dart';
 
 class SeatWidget extends StatefulWidget {
   final Seat seat;
-  final bool isReserved;
   final ValueChanged<bool> onSelected;
 
   const SeatWidget({
+    super.key,
     required this.seat,
-    required this.isReserved,
     required this.onSelected,
   });
 

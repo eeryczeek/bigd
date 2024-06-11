@@ -15,7 +15,7 @@ class SeatSelectionPage extends StatefulWidget {
 }
 
 class _SeatSelectionPageState extends State<SeatSelectionPage> {
-  late Future<Map<Seat, bool>> seatReservations;
+  late Future<List<Seat>> seatReservations;
   late Map<Seat, bool> selectedSeats;
 
   @override
@@ -34,7 +34,7 @@ class _SeatSelectionPageState extends State<SeatSelectionPage> {
               '${widget.movieShow.movie.title} - ${widget.movieShow.showTime.day}.${widget.movieShow.showTime.month}.${widget.movieShow.showTime.year} - ${widget.movieShow.showTime.hour}:${widget.movieShow.showTime.minute}'),
         ),
         body: Center(
-          child: FutureBuilder<Map<Seat, bool>>(
+          child: FutureBuilder<List<Seat>>(
             future: seatReservations,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -44,25 +44,26 @@ class _SeatSelectionPageState extends State<SeatSelectionPage> {
               } else {
                 return Column(
                   children: [
+                    const SizedBox(height: 16),
+                    Container(color: Colors.black, width: 1024, height: 16),
+                    const SizedBox(height: 64),
                     SizedBox(
-                      width: snapshot.data!.keys
-                              .map((seat) => seat.X)
-                              .reduce(max) *
+                      width: (snapshot.data!.map((seat) => seat.X).reduce(max) +
+                              1) *
                           64.0,
-                      height: snapshot.data!.keys
-                              .map((seat) => seat.Y)
-                              .reduce(max) *
-                          64.0,
+                      height:
+                          (snapshot.data!.map((seat) => seat.Y).reduce(max) +
+                                  1) *
+                              64.0,
                       child: Center(
                         child: Stack(
                           alignment: Alignment.center,
-                          children: snapshot.data!.keys.map((seat) {
+                          children: snapshot.data!.map((seat) {
                             return Positioned(
                               left: seat.X * 64.0,
                               top: seat.Y * 64.0,
                               child: SeatWidget(
                                 seat: seat,
-                                isReserved: snapshot.data![seat]!,
                                 onSelected: (isSelected) =>
                                     selectedSeats[seat] = isSelected,
                               ),

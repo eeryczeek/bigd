@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:frontend/models.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -21,56 +23,15 @@ Future<List<Movie>> fetchMovies() async {
     }
   } catch (e) {
     print('Failed to fetch movies: $e');
-    return <Movie>[
-      Movie(
+    return List<Movie>.generate(
+      8,
+      (index) => Movie(
         title: 'Movie Title',
         duration: 120,
         genres: ['Action', 'Adventure'],
         rating: 8.0,
       ),
-      Movie(
-        title: 'Movie Title',
-        duration: 120,
-        genres: ['Action', 'Adventure'],
-        rating: 8.0,
-      ),
-      Movie(
-        title: 'Movie Title',
-        duration: 120,
-        genres: ['Action', 'Adventure'],
-        rating: 8.0,
-      ),
-      Movie(
-        title: 'Movie Title',
-        duration: 120,
-        genres: ['Action', 'Adventure'],
-        rating: 8.0,
-      ),
-      Movie(
-        title: 'Movie Title',
-        duration: 120,
-        genres: ['Action', 'Adventure'],
-        rating: 8.0,
-      ),
-      Movie(
-        title: 'Movie Title',
-        duration: 120,
-        genres: ['Action', 'Adventure'],
-        rating: 8.0,
-      ),
-      Movie(
-        title: 'Movie Title',
-        duration: 120,
-        genres: ['Action', 'Adventure'],
-        rating: 8.0,
-      ),
-      Movie(
-        title: 'Movie Title',
-        duration: 120,
-        genres: ['Action', 'Adventure'],
-        rating: 8.0,
-      ),
-    ];
+    );
   }
 }
 
@@ -93,34 +54,21 @@ Future<List<MovieShow>> fetchMovieShows({required String movieTitle}) async {
     }
   } catch (e) {
     print('Failed to fetch movie shows: $e');
-    return <MovieShow>[
-      MovieShow(
-        movie: Movie(
-          title: 'Movie Title',
-          duration: 120,
-          genres: ['Action', 'Adventure'],
-          rating: 8.0,
-        ),
-        cinemaRoom: CinemaRoom(
-          name: 'Cinema Room Name',
-          seats: <Seat>[],
-        ),
-        showTime: DateTime.now(),
-      ),
-      MovieShow(
-        movie: Movie(
-          title: 'Movie Title',
-          duration: 120,
-          genres: ['Action', 'Adventure'],
-          rating: 8.0,
-        ),
-        cinemaRoom: CinemaRoom(
-          name: 'Cinema Room Name',
-          seats: <Seat>[],
-        ),
-        showTime: DateTime.now().add(const Duration(hours: 2)),
-      ),
-    ];
+    return List<MovieShow>.generate(
+        3,
+        (index) => MovieShow(
+              movie: Movie(
+                title: 'Movie Title',
+                duration: 120,
+                genres: ['Action', 'Adventure'],
+                rating: 8.0,
+              ),
+              cinemaRoom: CinemaRoom(
+                name: 'Cinema Room Name',
+                seats: <Seat>[],
+              ),
+              showTime: DateTime.now(),
+            ));
   }
 }
 
@@ -143,55 +91,35 @@ Future<CinemaRoom> fetchCinemaRoom({required String cinemaRoomName}) async {
     print('Failed to fetch cinema room: $e');
     return CinemaRoom(
       name: 'Cinema Room Name',
-      seats: <Seat>[
-        Seat(X: 0, Y: 0),
-        Seat(X: 0, Y: 1),
-        Seat(X: 0, Y: 2),
-        Seat(X: 0, Y: 3),
-        Seat(X: 1, Y: 0),
-        Seat(X: 1, Y: 1),
-        Seat(X: 1, Y: 2),
-        Seat(X: 1, Y: 3),
-        Seat(X: 2, Y: 0),
-        Seat(X: 2, Y: 1),
-        Seat(X: 2, Y: 2),
-        Seat(X: 2, Y: 3),
-      ],
+      seats: List<Seat>.generate(
+        32,
+        (index) => Seat(X: index % 8, Y: index ~/ 8),
+      ),
     );
   }
 }
 
-Future<Map<Seat, bool>> fetchReservations(
-    {required MovieShow movieShow}) async {
+Future<List<Seat>> fetchReservations({required MovieShow movieShow}) async {
   try {
     final response = await http.get(Uri.parse(
         'https://reservations/${movieShow.cinemaRoom.name}/${movieShow.showTime}/seats'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      return {
+      return <Seat>[
         for (var seat in data)
-          Seat(X: seat['X'], Y: seat['Y']): seat['isSelected']
-      };
+          Seat(X: seat['X'], Y: seat['Y'], isReserved: true)
+      ];
     } else {
       throw Exception('Failed to load reservations');
     }
   } catch (e) {
     print('Failed to fetch seats: $e');
-    return <Seat, bool>{
-      Seat(X: 0, Y: 0): false,
-      Seat(X: 0, Y: 1): false,
-      Seat(X: 0, Y: 2): false,
-      Seat(X: 0, Y: 3): false,
-      Seat(X: 1, Y: 0): false,
-      Seat(X: 1, Y: 1): false,
-      Seat(X: 1, Y: 2): false,
-      Seat(X: 1, Y: 3): false,
-      Seat(X: 2, Y: 0): false,
-      Seat(X: 2, Y: 1): false,
-      Seat(X: 2, Y: 2): false,
-      Seat(X: 2, Y: 3): false,
-    };
+    return List<Seat>.generate(
+      32,
+      (index) =>
+          Seat(X: index % 8, Y: index ~/ 8, isReserved: Random().nextBool()),
+    );
   }
 }
 

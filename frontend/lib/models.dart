@@ -15,9 +15,9 @@ class Movie {
 class Seat {
   final int X;
   final int Y;
-  final bool isReserved = false;
+  bool isReserved = false;
 
-  Seat({required this.X, required this.Y});
+  Seat({required this.X, required this.Y, this.isReserved = false});
 }
 
 class CinemaRoom {
