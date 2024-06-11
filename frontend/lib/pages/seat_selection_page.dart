@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/components/seat_widget.dart';
 import 'package:frontend/models.dart';
 import 'package:frontend/services.dart';
+import 'package:intl/intl.dart';
 
 class SeatSelectionPage extends StatefulWidget {
   final MovieShow movieShow;
@@ -29,9 +30,17 @@ class _SeatSelectionPageState extends State<SeatSelectionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            color: Theme.of(context).colorScheme.primary,
+          ),
           backgroundColor: Theme.of(context).colorScheme.secondary,
           title: Text(
-              '${widget.movieShow.movie.title} - ${widget.movieShow.showTime.day}.${widget.movieShow.showTime.month}.${widget.movieShow.showTime.year} - ${widget.movieShow.showTime.hour}:${widget.movieShow.showTime.minute}'),
+              '${widget.movieShow.movie.title}: ${DateFormat('yyyy-MM-dd hh:mm').format(widget.movieShow.showTime)}',
+              style: Theme.of(context).textTheme.titleLarge),
         ),
         body: Center(
           child: FutureBuilder<List<Seat>>(
@@ -46,7 +55,7 @@ class _SeatSelectionPageState extends State<SeatSelectionPage> {
                   children: [
                     const SizedBox(height: 16),
                     Container(color: Colors.black, width: 1024, height: 16),
-                    const SizedBox(height: 64),
+                    const SizedBox(height: 128),
                     SizedBox(
                       width: (snapshot.data!.map((seat) => seat.X).reduce(max) +
                               1) *
@@ -72,6 +81,7 @@ class _SeatSelectionPageState extends State<SeatSelectionPage> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 32),
                     ElevatedButton(
                       onPressed: () async {
                         if (selectedSeats.isNotEmpty) {

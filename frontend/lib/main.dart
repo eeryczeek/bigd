@@ -14,11 +14,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
           brightness: Brightness.light,
           colorScheme: const ColorScheme.light(
-              onSurface: Color.fromRGBO(5, 7, 7, 1),
-              surface: Color.fromRGBO(216, 232, 232, 1),
-              primary: Color.fromRGBO(132, 157, 159, 1),
-              secondary: Color.fromRGBO(192, 173, 183, 1),
-              tertiary: Color.fromRGBO(172, 155, 147, 1)),
+            onSurface: Color(0x05070701),
+            surface: Color(0xffaac1a7),
+            primary: Color(0xff74a463),
+            secondary: Color(0xffa7ccb6),
+            tertiary: Color(0xff58B69A),
+          ),
           useMaterial3: true,
           textTheme: const TextTheme(
               titleLarge: TextStyle(

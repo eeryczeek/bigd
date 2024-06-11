@@ -31,13 +31,15 @@ class CinemaRoom {
 }
 
 class MovieShow {
+  final String uuid;
   final Movie movie;
-  final CinemaRoom cinemaRoom;
+  final String cinemaRoomUuid;
   final DateTime showTime;
 
   MovieShow({
+    required this.uuid,
     required this.movie,
-    required this.cinemaRoom,
+    required this.cinemaRoomUuid,
     required this.showTime,
   });
 }

@@ -22,29 +22,37 @@ class _SeatWidgetState extends State<SeatWidget> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        if (widget.seat.isReserved) {
+          return;
+        }
         setState(() {
           isSelected = !isSelected;
         });
         widget.onSelected(isSelected);
       },
-      child: Container(
+      child: SizedBox(
         width: 64,
         height: 64,
-        decoration: BoxDecoration(
-          color: widget.seat.isReserved
-              ? Theme.of(context).colorScheme.secondary
-              : isSelected
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.tertiary,
-          border: Border.all(
-            color: widget.seat.isReserved
-                ? Theme.of(context).colorScheme.secondary
-                : isSelected
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.tertiary,
-            width: 2,
+        child: Center(
+          child: Container(
+            width: 56,
+            height: 56,
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: widget.seat.isReserved
+                  ? Colors.grey.shade600
+                  : Theme.of(context).colorScheme.secondary,
+              border: Border.all(
+                color: widget.seat.isReserved
+                    ? Colors.grey.shade600
+                    : isSelected
+                        ? Theme.of(context).colorScheme.tertiary
+                        : Theme.of(context).colorScheme.secondary,
+                width: 4,
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
-          borderRadius: BorderRadius.circular(4),
         ),
       ),
     );

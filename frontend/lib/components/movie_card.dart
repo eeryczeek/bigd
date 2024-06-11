@@ -29,14 +29,14 @@ class _MovieCardState extends State<MovieCard> {
         });
       },
       child: Card(
-        color: Theme.of(context).colorScheme.surface,
+        color: Theme.of(context).colorScheme.secondary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(
             color: isExpanded
-                ? Theme.of(context).colorScheme.primary
+                ? Theme.of(context).colorScheme.tertiary
                 : Colors.transparent,
-            width: 2,
+            width: 4,
           ),
         ),
         child: Column(
@@ -101,9 +101,9 @@ class _MovieCardState extends State<MovieCard> {
                               decoration: BoxDecoration(
                                 border: Border.all(
                                   color: hoverIndex == index
-                                      ? Theme.of(context).colorScheme.primary
+                                      ? Theme.of(context).colorScheme.tertiary
                                       : Colors.transparent,
-                                  width: 2,
+                                  width: 4,
                                 ),
                               ),
                               child: Text(

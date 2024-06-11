@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:frontend/models.dart';
 import 'package:http/http.dart' as http;
+import 'package:uuid/uuid.dart';
 import 'dart:convert';
 
 Future<List<Movie>> fetchMovies() async {
@@ -44,8 +45,9 @@ Future<List<MovieShow>> fetchMovieShows({required String movieTitle}) async {
       final List<dynamic> data = jsonDecode(response.body);
       return data
           .map((movieShow) => MovieShow(
+                uuid: const Uuid().v4(),
                 movie: movieShow['movie'],
-                cinemaRoom: movieShow['cinema_room'],
+                cinemaRoomUuid: movieShow['cinema_room_uuid'],
                 showTime: DateTime.parse(movieShow['show_time']),
               ))
           .toList();
@@ -57,17 +59,15 @@ Future<List<MovieShow>> fetchMovieShows({required String movieTitle}) async {
     return List<MovieShow>.generate(
         3,
         (index) => MovieShow(
+              uuid: const Uuid().v4(),
               movie: Movie(
                 title: 'Movie Title',
                 duration: 120,
                 genres: ['Action', 'Adventure'],
                 rating: 8.0,
               ),
-              cinemaRoom: CinemaRoom(
-                name: 'Cinema Room Name',
-                seats: <Seat>[],
-              ),
-              showTime: DateTime.now(),
+              cinemaRoomUuid: Uuid().v4(),
+              showTime: DateTime.now().add(Duration(days: index)),
             ));
   }
 }
@@ -101,8 +101,8 @@ Future<CinemaRoom> fetchCinemaRoom({required String cinemaRoomName}) async {
 
 Future<List<Seat>> fetchReservations({required MovieShow movieShow}) async {
   try {
-    final response = await http.get(Uri.parse(
-        'https://reservations/${movieShow.cinemaRoom.name}/${movieShow.showTime}/seats'));
+    final response =
+        await http.get(Uri.parse('https://reservations/${movieShow.uuid}'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
@@ -128,8 +128,7 @@ Future<void> createReservation(
     required Map<Seat, bool> selectedSeats}) async {
   try {
     final response = await http.post(
-      Uri.parse(
-          'https://reservations/${movieShow.cinemaRoom.name}/${movieShow.showTime}/seats'),
+      Uri.parse('https://reservations/${movieShow.uuid}/seats'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

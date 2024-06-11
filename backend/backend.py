@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from uuid import UUID, uuid4
 from typing import List
 from datetime import datetime
