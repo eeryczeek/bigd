@@ -31,14 +31,12 @@ get_all_shows_query = session.prepare("SELECT * FROM movie_shows_by_movie")
 
 
 def get_shows():
-    rows = session.execute(
-        get_all_shows_query
-    ).all()
+    rows = session.execute(get_all_shows_query).all()
     return [
         MovieShow(
             show_id=row.show_id,
             movie_title=row.movie_title,
-            room_title=row.room_name,
+            room_name=row.room_name,
             show_time=row.show_time,
         )
         for row in rows
