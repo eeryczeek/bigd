@@ -18,6 +18,7 @@ class SeatSelectionPage extends StatefulWidget {
 class _SeatSelectionPageState extends State<SeatSelectionPage> {
   late Future<List<Seat>> seatReservations;
   late Map<Seat, bool> selectedSeats;
+  bool submitHover = false;
 
   @override
   void initState() {
@@ -82,16 +83,29 @@ class _SeatSelectionPageState extends State<SeatSelectionPage> {
                       ),
                     ),
                     const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: () async {
-                        if (selectedSeats.isNotEmpty) {
-                          createReservation(
-                            movieShow: widget.movieShow,
-                            selectedSeats: selectedSeats,
-                          );
-                        }
-                      },
-                      child: const Text('Proceed to checkout'),
+                    MouseRegion(
+                      onHover: (event) => submitHover = !submitHover,
+                      onExit: (event) => submitHover = !submitHover,
+                      child: GestureDetector(
+                          onTap: () {
+                            if (selectedSeats.isNotEmpty) {
+                              createReservation(
+                                movieShow: widget.movieShow,
+                                selectedSeats: selectedSeats,
+                              );
+                            }
+                          },
+                          child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: submitHover
+                                      ? Theme.of(context).colorScheme.tertiary
+                                      : Colors.transparent,
+                                  width: 4,
+                                ),
+                              ),
+                              child: const Text('Reserve seats'))),
                     ),
                   ],
                 );
