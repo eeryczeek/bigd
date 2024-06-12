@@ -4,8 +4,11 @@ from uuid import UUID
 from datetime import datetime
 
 
+class User(BaseModel):
+    email: str
+
+
 class Movie(BaseModel):
-    uuid: UUID
     title: str
     duration: int
     genres: List[str]
@@ -13,26 +16,24 @@ class Movie(BaseModel):
 
 
 class Seat(BaseModel):
-    uuid: UUID
     x: int
     y: int
+    is_reserved: bool | None
 
 
 class CinemaRoom(BaseModel):
-    uuid: UUID
     name: str
     seats: List[Seat]
 
 
 class MovieShow(BaseModel):
     uuid: UUID
-    movie_uuid: UUID
-    cinema_room_uuid: UUID
+    movie: str
+    room: str
     show_time: datetime
 
 
 class SeatReservation(BaseModel):
-    cinema_room_uuid: UUID
-    show_time: datetime
-    seat_uuid: UUID
-    user_id: UUID
+    show_uuid: UUID
+    seat: Seat
+    user: str
