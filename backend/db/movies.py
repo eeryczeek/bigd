@@ -3,8 +3,7 @@ from db.connection import session
 from typing import List
 
 get_movies_query = session.prepare("SELECT * FROM movies")
-get_movies_by_title_query = session.prepare(
-    "SELECT * FROM movies WHERE title = ?")
+get_movies_by_title_query = session.prepare("SELECT * FROM movies WHERE title = ?")
 
 
 def get_movies() -> List[Movie]:
@@ -23,7 +22,7 @@ create_movie_query = session.prepare(
 
 
 def create_movie(new_movie: Movie):
-    session.execute(
+    return session.execute(
         create_movie_query,
         [
             new_movie.title,
@@ -38,5 +37,4 @@ delete_movie_query = session.prepare("DELETE FROM movies WHERE title = ?")
 
 
 def delete_movie_by_title(title: str):
-    session.execute(delete_movie_query, [title])
-    return None
+    return session.execute(delete_movie_query, [title])

@@ -18,7 +18,7 @@ class Movie(BaseModel):
 class Seat(BaseModel):
     x: int
     y: int
-    is_reserved: bool = None
+    is_reserved: bool | None = None
 
 
 class CinemaRoom(BaseModel):

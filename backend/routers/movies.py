@@ -2,24 +2,24 @@ from fastapi.routing import APIRouter
 import db.movies as movies
 from models import Movie
 
-router = APIRouter()
+router = APIRouter(prefix="/movies", tags=["movies"])
 
 
-@router.get("/movies")
+@router.get("/", response_model=list[Movie])
 def get_movies():
     return movies.get_movies()
 
 
-@router.get("/movies/{movie_title}")
+@router.get("/{movie_title}", response_model=Movie)
 def get_movie(movie_title: str):
     return movies.get_movie_by_title(movie_title)
 
 
-@router.post("/movies")
+@router.post("/")
 def add_movie(movie: Movie):
     return movies.create_movie(movie)
 
 
-@router.delete("/movies/{movie_title}")
+@router.delete("/{movie_title}")
 def delete_movie(movie_title: str):
     return movies.delete_movie_by_title(movie_title)

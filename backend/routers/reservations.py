@@ -3,14 +3,14 @@ from fastapi.routing import APIRouter
 import db.reservations as reservations
 from models import SeatReservation
 
-router = APIRouter()
+router = APIRouter(prefix="/reservations", tags=["reservations"])
 
 
-@router.get("/reservations/{show_uuid}")
+@router.get("/{show_uuid}")
 def get_reservations(show_uuid: UUID):
     return reservations.get_reservations_for_show(show_uuid)
 
 
-@router.post("/reservations/{show_uuid}")
+@router.post("/")
 def add_reservation(reservation: SeatReservation):
     return reservations.create_reservation_for_show(reservation)

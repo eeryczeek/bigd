@@ -1,16 +1,18 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from routers import movies, rooms, shows, reservations
+from db import seed
 
-app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    seed.insert_sample_data()
+    yield
+    seed.clean_up()
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 app.include_router(movies.router)
