@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Set
 from uuid import UUID
 from datetime import datetime
 
@@ -11,7 +11,7 @@ class User(BaseModel):
 class Movie(BaseModel):
     title: str
     duration: int
-    genres: List[str]
+    genres: Set[str]
     rating: float
 
 
@@ -23,7 +23,7 @@ class Seat(BaseModel):
 
 class CinemaRoom(BaseModel):
     name: str
-    seats: List[Seat]
+    seats: Set[Seat]
 
 
 class MovieShow(BaseModel):
