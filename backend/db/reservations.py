@@ -28,7 +28,6 @@ get_reservation_query = session.prepare(
 
 def get_reservations_for_show(show_uuid):
     rows = session.execute(get_reservation_query, [show_uuid]).all()
-    print(rows)
     return [SeatReservation(
         show_id=row.show_id,
         seat=Seat(**row.seat._asdict()),
