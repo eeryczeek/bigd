@@ -82,30 +82,25 @@ class _SeatSelectionPageState extends State<SeatSelectionPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 16),
                     MouseRegion(
-                      onHover: (event) => submitHover = !submitHover,
-                      onExit: (event) => submitHover = !submitHover,
-                      child: GestureDetector(
-                          onTap: () {
-                            if (selectedSeats.isNotEmpty) {
-                              createReservation(
-                                movieShow: widget.movieShow,
-                                selectedSeats: selectedSeats,
-                              );
-                            }
-                          },
-                          child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: submitHover
-                                      ? Theme.of(context).colorScheme.tertiary
-                                      : Colors.transparent,
-                                  width: 4,
-                                ),
-                              ),
-                              child: const Text('Reserve seats'))),
+                      cursor: SystemMouseCursors.click,
+                      onHover: (event) => setState(() => submitHover = true),
+                      onExit: (event) => setState(() => submitHover = false),
+                      child: OutlinedButton(
+                        onPressed: () {
+                          // Add your onPressed logic here
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(
+                            color: submitHover
+                                ? Theme.of(context).colorScheme.tertiary
+                                : Theme.of(context).colorScheme.secondary,
+                            width: 2,
+                          ),
+                        ),
+                        child: const Text('Reserve seats'),
+                      ),
                     ),
                   ],
                 );
