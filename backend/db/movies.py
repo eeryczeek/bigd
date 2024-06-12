@@ -3,7 +3,8 @@ from db.connection import session
 from typing import List
 
 get_movies_query = session.prepare("SELECT * FROM movies")
-get_movies_by_title_query = session.prepare("SELECT * FROM movies WHERE title = ?")
+get_movies_by_title_query = session.prepare(
+    "SELECT * FROM movies WHERE title = ?")
 
 
 def get_movies() -> List[Movie]:

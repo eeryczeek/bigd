@@ -11,7 +11,7 @@ class User(BaseModel):
 class Movie(BaseModel):
     title: str
     duration: int
-    genres: Set[str]
+    genres: List[str]
     rating: float
 
 
@@ -23,13 +23,13 @@ class Seat(BaseModel):
 
 class CinemaRoom(BaseModel):
     name: str
-    seats: Set[Seat]
+    seats: List[Seat]
 
 
 class MovieShow(BaseModel):
-    uuid: UUID
-    movie: str
-    room: str
+    show_id: UUID
+    movie_title: str
+    room_name: str
     show_time: datetime
 
 

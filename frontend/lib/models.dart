@@ -32,14 +32,14 @@ class CinemaRoom {
 
 class MovieShow {
   final String uuid;
-  final Movie movie;
-  final String cinemaRoomUuid;
+  final String movieTitle;
+  final String cinemaRoomName;
   final DateTime showTime;
 
   MovieShow({
     required this.uuid,
-    required this.movie,
-    required this.cinemaRoomUuid,
+    required this.movieTitle,
+    required this.cinemaRoomName,
     required this.showTime,
   });
 }

@@ -6,6 +6,11 @@ from uuid import UUID
 router = APIRouter()
 
 
+@router.get("/shows")
+def get_all_shows():
+    return shows.get_shows()
+
+
 @router.get("/shows/{movie_title}")
 def get_shows(movie_title: str):
     return shows.get_show_by_movie(movie_title)

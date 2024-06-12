@@ -18,9 +18,27 @@ def get_show_by_movie(movie_title: str, show_time: datetime | None = datetime.no
     ).all()
     return [
         MovieShow(
-            uuid=row.uuid,
-            movie=row.movie_title,
-            room=row.room_name,
+            show_id=row.show_id,
+            movie_title=row.movie_title,
+            room_title=row.room_name,
+            show_time=row.show_time,
+        )
+        for row in rows
+    ]
+
+
+get_all_shows_query = session.prepare("SELECT * FROM movie_shows_by_movie")
+
+
+def get_shows():
+    rows = session.execute(
+        get_all_shows_query
+    ).all()
+    return [
+        MovieShow(
+            show_id=row.show_id,
+            movie_title=row.movie_title,
+            room_title=row.room_name,
             show_time=row.show_time,
         )
         for row in rows
@@ -30,14 +48,15 @@ def get_show_by_movie(movie_title: str, show_time: datetime | None = datetime.no
 def get_show_by_id(show_uuid):
     row = session.execute(get_show_by_id_query, [show_uuid]).one()
     return MovieShow(
-        uuid=row.uuid,
-        movie=row.movie_title,
-        room=row.room_name,
+        show_id=row.show_id,
+        movie_title=row.movie_title,
+        room_name=row.room_name,
         show_time=row.show_time,
     )
 
 
-get_seats_by_show = session.prepare("SELECT * FROM seats_by_show WHERE show_id = ?")
+get_seats_by_show = session.prepare(
+    "SELECT * FROM seats_by_show WHERE show_id = ?")
 
 
 def get_seats_for_show(show_uuid):
@@ -51,18 +70,19 @@ create_show_by_id = session.prepare(
 create_show_by_movie = session.prepare(
     "INSERT INTO movie_shows_by_movie (show_id, movie_title, room_name, show_time) VALUES (?, ?, ?, ?)"
 )
-create_seat = session.prepare("INSERT INTO seats_by_show (show_id, seat) VALUES (?, ?)")
+create_seat = session.prepare(
+    "INSERT INTO seats_by_show (show_id, seat) VALUES (?, ?)")
 
 
 def create_show(show: MovieShow):
     new_show_id = uuid.uuid4()
-    room = get_room_by_name(show.room)
+    room = get_room_by_name(show.room_name)
     session.execute(
         create_show_by_id,
         [
             new_show_id,
-            show.movie,
-            show.room,
+            show.movie_title,
+            show.room_name,
             show.show_time,
         ],
     )
@@ -70,8 +90,8 @@ def create_show(show: MovieShow):
         create_show_by_movie,
         [
             new_show_id,
-            show.movie,
-            show.room,
+            show.movie_title,
+            show.room_name,
             show.show_time,
         ],
     )
@@ -82,7 +102,10 @@ def create_show(show: MovieShow):
         )
 
 
-delete_show_by_id = session.prepare("DELETE FROM movie_shows_by_id WHERE show_id = ?")
+delete_show_by_id = session.prepare(
+    "DELETE FROM movie_shows_by_id WHERE show_id = ?")
+
+
 delete_show_by_movie_id = session.prepare(
     "DELETE FROM movie_shows_by_movie WHERE movie_title = ? AND show_time = ? AND room_name = ?"
 )
@@ -91,4 +114,5 @@ delete_show_by_movie_id = session.prepare(
 def delete_show(show_uuid):
     show = get_show_by_id(show_uuid)
     session.execute(delete_show_by_id, [show_uuid])
-    session.execute(delete_show_by_movie_id, [show.movie, show.show_time, show.room])
+    session.execute(delete_show_by_movie_id, [
+                    show.movie_title, show.show_time, show.room_name])

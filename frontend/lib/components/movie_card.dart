@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/models.dart';
 import 'package:frontend/pages/seat_selection_page.dart';
 import 'package:frontend/services.dart';
+import 'package:intl/intl.dart';
 
 class MovieCard extends StatefulWidget {
   final Movie movie;
@@ -107,7 +108,7 @@ class _MovieCardState extends State<MovieCard> {
                                 ),
                               ),
                               child: Text(
-                                '${show.showTime.day}.${show.showTime.month}.${show.showTime.year} - ${show.showTime.hour}:${show.showTime.minute}',
+                                DateFormat('EEE hh:mm').format(show.showTime),
                                 style: Theme.of(context).textTheme.bodyMedium,
                               ),
                             ),

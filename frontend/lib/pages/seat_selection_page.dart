@@ -19,12 +19,20 @@ class _SeatSelectionPageState extends State<SeatSelectionPage> {
   late Future<List<Seat>> seatReservations;
   late Map<Seat, bool> selectedSeats;
   bool submitHover = false;
+  bool inputHover = false;
+  final nameController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     seatReservations = fetchReservations(movieShow: widget.movieShow);
     selectedSeats = {};
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    super.dispose();
   }
 
   @override
@@ -40,7 +48,7 @@ class _SeatSelectionPageState extends State<SeatSelectionPage> {
           ),
           backgroundColor: Theme.of(context).colorScheme.secondary,
           title: Text(
-              '${widget.movieShow.movie.title}: ${DateFormat('yyyy-MM-dd hh:mm').format(widget.movieShow.showTime)}',
+              '${widget.movieShow.movieTitle}: ${DateFormat('yyyy-MM-dd hh:mm').format(widget.movieShow.showTime)}',
               style: Theme.of(context).textTheme.titleLarge),
         ),
         body: Center(
@@ -82,25 +90,89 @@ class _SeatSelectionPageState extends State<SeatSelectionPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      onHover: (event) => setState(() => submitHover = true),
-                      onExit: (event) => setState(() => submitHover = false),
-                      child: OutlinedButton(
-                        onPressed: () {
-                          // Add your onPressed logic here
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                            color: submitHover
-                                ? Theme.of(context).colorScheme.tertiary
-                                : Theme.of(context).colorScheme.secondary,
-                            width: 2,
+                    const SizedBox(height: 32),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 256,
+                          height: 32,
+                          child: TextField(
+                            controller: nameController,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 8.0, horizontal: 16.0),
+                              border: OutlineInputBorder(
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(16.0)),
+                                borderSide: BorderSide(
+                                  color: inputHover
+                                      ? Theme.of(context).colorScheme.tertiary
+                                      : Theme.of(context).colorScheme.secondary,
+                                  width: 2,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(16.0)),
+                                borderSide: BorderSide(
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
+                                  width: 2,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(16.0)),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.tertiary,
+                                  width: 2,
+                                ),
+                              ),
+                              hintText: 'Enter your name',
+                              hintStyle: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.w300,
+                                fontSize: 16.0,
+                              ),
+                            ),
                           ),
                         ),
-                        child: const Text('Reserve seats'),
-                      ),
+                        const SizedBox(width: 16),
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          onHover: (event) =>
+                              setState(() => submitHover = true),
+                          onExit: (event) =>
+                              setState(() => submitHover = false),
+                          child: OutlinedButton(
+                            onPressed: () {
+                              String name = nameController.text;
+                              List<Seat> selectedSeatsList = selectedSeats
+                                  .entries
+                                  .where((entry) => entry.value)
+                                  .map((entry) => entry.key)
+                                  .toList();
+                              createReservation(
+                                  user: name,
+                                  movieShowUuid: widget.movieShow.uuid,
+                                  selectedSeats: selectedSeatsList);
+                            },
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(
+                                color: submitHover
+                                    ? Theme.of(context).colorScheme.tertiary
+                                    : Theme.of(context).colorScheme.secondary,
+                                width: 2,
+                              ),
+                            ),
+                            child: const Text(
+                              'Reserve seats',
+                              style: TextStyle(fontSize: 16.0),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 );
