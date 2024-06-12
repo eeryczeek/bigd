@@ -5,23 +5,23 @@ from db.rooms import get_room_by_name
 import uuid
 
 get_shows_by_movie_title_query = session.prepare(
-    "SELECT * FROM movie_shows_by_movie WHERE movie_title = ? AND show_time > ?"
+    "SELECT * FROM movie_shows_by_movie WHERE movie_title = ?"
 )
 get_show_by_id_query = session.prepare(
     "SELECT * FROM movie_shows_by_id WHERE show_id = ?"
 )
 
 
-def get_show_by_movie(movie_title: str, show_time: datetime | None = datetime.now()):
+def get_show_by_movie(movie_title: str):
     rows = session.execute(
-        get_shows_by_movie_title_query, [movie_title, show_time]
+        get_shows_by_movie_title_query, [movie_title]
     ).all()
     return [
         MovieShow(
             show_id=row.show_id,
             movie_title=row.movie_title,
-            room_title=row.room_name,
-            show_time=row.show_time,
+            room_name=row.room_name,
+            show_time=row.show_time
         )
         for row in rows
     ]

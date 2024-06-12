@@ -60,6 +60,6 @@ CREATE TABLE IF NOT EXISTS seat_reservations (
 CREATE TABLE IF NOT EXISTS reservations_by_user (
     user_mail TEXT,
     show_id UUID,
-    seat seat,
-    PRIMARY KEY (user_mail, show_id)
+    seat frozen<seat>,
+    PRIMARY KEY (user_mail, show_id, seat)
 );

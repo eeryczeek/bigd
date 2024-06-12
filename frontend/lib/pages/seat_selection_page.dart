@@ -3,20 +3,22 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:frontend/components/seat_widget.dart';
 import 'package:frontend/models.dart';
+import 'package:frontend/pages/reservation_page.dart';
 import 'package:frontend/services.dart';
 import 'package:intl/intl.dart';
 
 class SeatSelectionPage extends StatefulWidget {
   final MovieShow movieShow;
 
-  const SeatSelectionPage({required this.movieShow});
+  const SeatSelectionPage({super.key, required this.movieShow});
 
   @override
   _SeatSelectionPageState createState() => _SeatSelectionPageState();
 }
 
 class _SeatSelectionPageState extends State<SeatSelectionPage> {
-  late Future<List<Seat>> seatReservations;
+  late Future<List<Reservation>> seatReservations;
+  late Future<CinemaRoom> cinemaRoom;
   late Map<Seat, bool> selectedSeats;
   bool submitHover = false;
   bool inputHover = false;
@@ -26,6 +28,7 @@ class _SeatSelectionPageState extends State<SeatSelectionPage> {
   void initState() {
     super.initState();
     seatReservations = fetchReservations(movieShow: widget.movieShow);
+    cinemaRoom = fetchCinemaRoom(cinemaRoomName: widget.movieShow.roomName);
     selectedSeats = {};
   }
 
@@ -52,31 +55,39 @@ class _SeatSelectionPageState extends State<SeatSelectionPage> {
               style: Theme.of(context).textTheme.titleLarge),
         ),
         body: Center(
-          child: FutureBuilder<List<Seat>>(
-            future: seatReservations,
+          child: FutureBuilder(
+            future: Future.wait([seatReservations, cinemaRoom]),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const CircularProgressIndicator();
               } else if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
               } else {
+                List<Reservation> reservations =
+                    snapshot.data![0] as List<Reservation>;
+                CinemaRoom room = snapshot.data![1] as CinemaRoom;
+                print(room.seats[0].isReserved);
+                print(reservations);
+                for (Seat seat in room.seats) {
+                  seat.isReserved = reservations
+                      .any((reservation) => reservation.seat == seat);
+                }
                 return Column(
                   children: [
                     const SizedBox(height: 16),
                     Container(color: Colors.black, width: 1024, height: 16),
                     const SizedBox(height: 128),
                     SizedBox(
-                      width: (snapshot.data!.map((seat) => seat.X).reduce(max) +
-                              1) *
-                          64.0,
+                      width:
+                          (room.seats.map((seat) => seat.X).reduce(max) + 1) *
+                              64.0,
                       height:
-                          (snapshot.data!.map((seat) => seat.Y).reduce(max) +
-                                  1) *
+                          (room.seats.map((seat) => seat.Y).reduce(max) + 1) *
                               64.0,
                       child: Center(
                         child: Stack(
                           alignment: Alignment.center,
-                          children: snapshot.data!.map((seat) {
+                          children: room.seats.map((seat) {
                             return Positioned(
                               left: seat.X * 64.0,
                               top: seat.Y * 64.0,
@@ -139,38 +150,26 @@ class _SeatSelectionPageState extends State<SeatSelectionPage> {
                           ),
                         ),
                         const SizedBox(width: 16),
-                        MouseRegion(
-                          cursor: SystemMouseCursors.click,
-                          onHover: (event) =>
-                              setState(() => submitHover = true),
-                          onExit: (event) =>
-                              setState(() => submitHover = false),
-                          child: OutlinedButton(
-                            onPressed: () {
-                              String name = nameController.text;
-                              List<Seat> selectedSeatsList = selectedSeats
-                                  .entries
-                                  .where((entry) => entry.value)
-                                  .map((entry) => entry.key)
-                                  .toList();
-                              createReservation(
-                                  user: name,
-                                  movieShowUuid: widget.movieShow.uuid,
-                                  selectedSeats: selectedSeatsList);
-                            },
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(
-                                color: submitHover
-                                    ? Theme.of(context).colorScheme.tertiary
-                                    : Theme.of(context).colorScheme.secondary,
-                                width: 2,
-                              ),
-                            ),
-                            child: const Text(
-                              'Reserve seats',
-                              style: TextStyle(fontSize: 16.0),
-                            ),
-                          ),
+                        ReserveSeatsButton(
+                          onPressed: () async {
+                            String name = nameController.text;
+                            List<Seat> selectedSeatsList = selectedSeats.entries
+                                .where((entry) => entry.value)
+                                .map((entry) => entry.key)
+                                .toList();
+                            await createReservation(
+                                user: name,
+                                movieShowUuid: widget.movieShow.uuid,
+                                selectedSeats: selectedSeatsList);
+
+                            // Navigate to the new page
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      ReservationPage(user: name)),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -180,5 +179,44 @@ class _SeatSelectionPageState extends State<SeatSelectionPage> {
             },
           ),
         ));
+  }
+}
+
+class ReserveSeatsButton extends StatefulWidget {
+  final Function onPressed;
+
+  ReserveSeatsButton({required this.onPressed});
+
+  @override
+  _ReserveSeatsButtonState createState() => _ReserveSeatsButtonState();
+}
+
+class _ReserveSeatsButtonState extends State<ReserveSeatsButton> {
+  bool submitHover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onHover: (event) => setState(() => submitHover = true),
+      onExit: (event) => setState(() => submitHover = false),
+      child: OutlinedButton(
+        onPressed: () async {
+          widget.onPressed();
+        },
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(
+            color: submitHover
+                ? Theme.of(context).colorScheme.tertiary
+                : Theme.of(context).colorScheme.secondary,
+            width: 2,
+          ),
+        ),
+        child: const Text(
+          'Reserve seats',
+          style: TextStyle(fontSize: 16.0),
+        ),
+      ),
+    );
   }
 }
