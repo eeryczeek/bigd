@@ -1,5 +1,9 @@
 from locust import HttpUser, task, between, SequentialTaskSet
 
+'''
+python -m locust -f stresstests.py --headless -u 1 -r 1 --run-time 1m
+'''
+
 
 class UserBehavior(HttpUser):
     host = "http://localhost:8000"
