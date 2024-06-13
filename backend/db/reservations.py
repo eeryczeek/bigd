@@ -1,7 +1,6 @@
 from uuid import UUID
 from models import Seat, SeatReservation
 from db.connection import session
-from db.shows import update_seats_by_show
 
 create_reservation = session.prepare(
     query="""INSERT INTO seat_reservations (show_id, seat, user_mail) VALUES (?, ?, ?) IF NOT EXISTS"""
@@ -13,7 +12,7 @@ create_reservation_by_user = session.prepare(
 
 
 def create_reservation_for_show(reservation: SeatReservation):
-    res = session.execute(
+    session.execute(
         create_reservation,
         [
             reservation.show_id,
@@ -21,17 +20,6 @@ def create_reservation_for_show(reservation: SeatReservation):
             reservation.user_mail,
         ],
     )
-    if res.one().was_applied:
-        session.execute(
-            create_reservation_by_user,
-            [
-                reservation.user_mail,
-                reservation.show_id,
-                reservation.seat,
-            ],
-        )
-        reservation.seat.is_reserved = True
-        update_seats_by_show(reservation.show_id, reservation.seat)
 
 
 get_reservation_query = session.prepare(
@@ -58,15 +46,3 @@ delete_reservation_query = session.prepare(
 
 def delete_reservation_for_show(show_uuid: UUID, seat: Seat):
     return session.execute(delete_reservation_query, [show_uuid, seat])
-
-
-def update_reservation(reservation: SeatReservation):
-    pass
-
-
-def get_reservations_by_user(user_mail):
-    pass
-
-
-def delete_reservation_by_user(user_mail, show_id, seat):
-    pass

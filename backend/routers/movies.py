@@ -1,5 +1,4 @@
 from fastapi.routing import APIRouter
-from fastapi.logger import logger
 import db.movies as movies
 from models import Movie
 
@@ -18,9 +17,7 @@ def get_movie(movie_title: str):
 
 @router.post("/")
 def add_movie(movie: Movie):
-    movie = movies.create_movie(movie)
-    print(f"Returned from creation of movie: {movie}")
-    return movie
+    return movies.create_movie(movie)
 
 
 @router.delete("/{movie_title}")
