@@ -11,6 +11,6 @@ def get_reservations(show_uuid: UUID):
     return reservations.get_reservations_for_show(show_uuid)
 
 
-@router.post("/")
+@router.post("/{show_uuid}")
 def add_reservation(reservation: SeatReservation):
     return reservations.create_reservation_for_show(reservation)

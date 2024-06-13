@@ -66,8 +66,6 @@ class _SeatSelectionPageState extends State<SeatSelectionPage> {
                 List<Reservation> reservations =
                     snapshot.data![0] as List<Reservation>;
                 CinemaRoom room = snapshot.data![1] as CinemaRoom;
-                print(room.seats[0].isReserved);
-                print(reservations);
                 for (Seat seat in room.seats) {
                   seat.isReserved = reservations
                       .any((reservation) => reservation.seat == seat);
