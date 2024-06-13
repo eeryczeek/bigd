@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS movie_shows_by_id (
 
 CREATE TABLE IF NOT EXISTS seats_by_show (
     show_id UUID,
-    seat frozen<seat>,
-    PRIMARY KEY (show_id, seat)
+    seats LIST<frozen<seat>>,
+    PRIMARY KEY (show_id)
 );
 
 -- Reservations table
