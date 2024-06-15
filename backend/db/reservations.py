@@ -39,6 +39,34 @@ def get_reservations_for_show(show_uuid):
     ]
 
 
+get_all_reservations_query = session.prepare("SELECT * FROM seat_reservations")
+
+
+def get_all_reservations():
+    rows = session.execute(get_all_reservations_query).all()
+    return [
+        SeatReservation(
+            show_id=row.show_id,
+            seat=Seat(**row.seat._asdict()),
+            user_mail=row.user_mail,
+        )
+        for row in rows
+    ]
+
+
+def get_reservations_for_user(user_mail):
+    rows = session.execute(
+        "SELECT * FROM reservations_by_user WHERE user_mail = ?", [user_mail]).all()
+    return [
+        SeatReservation(
+            show_id=row.show_id,
+            seat=Seat(**row.seat._asdict()),
+            user_mail=row.user_mail,
+        )
+        for row in rows
+    ]
+
+
 delete_reservation_query = session.prepare(
     query="DELETE FROM seat_reservations WHERE show_id = ? AND seat = ?"
 )

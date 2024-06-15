@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:frontend/components/seat_widget.dart';
 import 'package:frontend/models.dart';
-import 'package:frontend/pages/reservation_page.dart';
+import 'package:frontend/pages/movies_page.dart';
 import 'package:frontend/services.dart';
 import 'package:intl/intl.dart';
 
@@ -165,7 +165,7 @@ class _SeatSelectionPageState extends State<SeatSelectionPage> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      ReservationPage(user: name)),
+                                      const MoviesPage(title: 'Movies')),
                             );
                           },
                         ),
