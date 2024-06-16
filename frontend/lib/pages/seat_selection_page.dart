@@ -89,11 +89,22 @@ class _SeatSelectionPageState extends State<SeatSelectionPage> {
                             return Positioned(
                               left: seat.X * 64.0,
                               top: seat.Y * 64.0,
-                              child: SeatWidget(
-                                seat: seat,
-                                onSelected: (isSelected) =>
-                                    selectedSeats[seat] = isSelected,
-                              ),
+                              child: reservations.any(
+                                      (reservation) => reservation.seat == seat)
+                                  ? SeatWidget(
+                                      seat: seat,
+                                      onSelected: (isSelected) =>
+                                          selectedSeats[seat] = isSelected,
+                                      reservedBy: reservations
+                                          .firstWhere((reservation) =>
+                                              reservation.seat == seat)
+                                          .user,
+                                    )
+                                  : SeatWidget(
+                                      seat: seat,
+                                      onSelected: (isSelected) =>
+                                          selectedSeats[seat] = isSelected,
+                                    ),
                             );
                           }).toList(),
                         ),
