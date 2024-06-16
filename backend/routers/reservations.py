@@ -28,4 +28,4 @@ def delete_reservation(show_uuid: UUID, seat: SeatReservation):
 
 @router.post("/{show_uuid}")
 def add_reservation(reservation: SeatReservation):
-    return reservations.create_reservation_for_show(reservation)
+    return reservations.create_reservation(reservation)

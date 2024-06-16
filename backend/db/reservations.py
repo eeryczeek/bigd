@@ -2,7 +2,7 @@ from uuid import UUID
 from models import Seat, SeatReservation
 from db.connection import session
 
-create_reservation = session.prepare(
+create_reservation_query = session.prepare(
     query="""INSERT INTO seat_reservations (show_id, seat, user_mail) VALUES (?, ?, ?) IF NOT EXISTS"""
 )
 
@@ -11,20 +11,33 @@ create_reservation_by_user = session.prepare(
 )
 
 
-def create_reservation_for_show(reservation: SeatReservation):
-    session.execute(
-        create_reservation,
+get_reservation_query = session.prepare(
+    "SELECT * FROM seat_reservations WHERE show_id = ?"
+)
+
+get_reservations_by_user_query = session.prepare(
+    "SELECT * FROM reservations_by_user WHERE user_mail = ?"
+)
+
+
+def create_reservation(reservation: SeatReservation):
+    res = session.execute(
+        create_reservation_query,
         [
             reservation.show_id,
             reservation.seat,
             reservation.user_mail,
         ],
     )
-
-
-get_reservation_query = session.prepare(
-    "SELECT * FROM seat_reservations WHERE show_id = ?"
-)
+    if res.one().was_applied:
+        session.execute(
+            create_reservation_by_user,
+            [
+                reservation.user_mail,
+                reservation.show_id,
+                reservation.seat,
+            ],
+        )
 
 
 def get_reservations_for_show(show_uuid):
@@ -56,7 +69,8 @@ def get_all_reservations():
 
 def get_reservations_for_user(user_mail):
     rows = session.execute(
-        "SELECT * FROM reservations_by_user WHERE user_mail = ?", [user_mail]).all()
+        "SELECT * FROM reservations_by_user WHERE user_mail = ?", [user_mail]
+    ).all()
     return [
         SeatReservation(
             show_id=row.show_id,
@@ -74,3 +88,8 @@ delete_reservation_query = session.prepare(
 
 def delete_reservation_for_show(show_uuid: UUID, seat: Seat):
     return session.execute(delete_reservation_query, [show_uuid, seat])
+
+
+def get_reservations_by_user(user_mail):
+    rows = session.execute(get_reservations_by_user_query, [user_mail])
+    return [SeatReservation(**row._asdict()) for row in rows]
