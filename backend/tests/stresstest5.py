@@ -19,7 +19,7 @@ class StressTest5(SequentialTaskSet):
                 }
                 self.client.post(
                     f"/reservations/{movieShow['show_id']}", json=reservation_data)
-                self.client.delete(
+                self.client.put(
                     f"/reservations/{movieShow['show_id']}", json=reservation_data)
 
 

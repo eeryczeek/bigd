@@ -1,4 +1,4 @@
-from locust import HttpUser, task, between, SequentialTaskSet, TaskSet, events
+from locust import HttpUser, task, between, SequentialTaskSet
 from locust.env import Environment
 from locust.stats import stats_printer, stats_history
 from locust.log import setup_logging
