@@ -182,8 +182,6 @@ def update_reservation(
     previous_reservation = get_reservation_by_id(previous_reservation_uuid)
     if not previous_reservation:
         return False, "Reservation not found"
-    if previous_reservation.user_mail != new_reservation.user_mail:
-        return False, "Seat cannot be updated by another user"
     if create_reservation(new_reservation):
         delete_reservation(previous_reservation_uuid)
         return True, None
