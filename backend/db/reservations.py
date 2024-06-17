@@ -22,6 +22,10 @@ get_reservations_by_user_query = session.prepare(
     "SELECT * FROM reservations_by_user WHERE user_mail = ?"
 )
 
+get_reservation_by_show_and_seat_query = session.prepare(
+    "SELECT * FROM reservations WHERE show_id = ? AND seat = ?"
+)
+
 
 def create_reservation(reservation: SeatReservation):
     new_reservation_id = uuid4()
@@ -84,6 +88,20 @@ def get_reservation_by_id(reservation_id: UUID) -> SeatReservation | None:
         id=row.id,
         show_id=row.show_id,
         seat=Seat(**row.seat._asdict()),
+        user_mail=row.user_mail,
+    )
+
+
+def get_reservation_by_show_and_seat(
+    show_id: UUID, seat: Seat
+) -> SeatReservation | None:
+    row = session.execute(get_reservation_by_show_and_seat_query, [show_id, seat]).one()
+    if not row:
+        return None
+    return SeatReservation(
+        id=row.id,
+        show_id=row.show_id,
+        seat=Seat(**row.seat._asdict(), is_reserved=True),
         user_mail=row.user_mail,
     )
 

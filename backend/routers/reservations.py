@@ -44,6 +44,9 @@ def add_reservation(reservation: SeatReservation):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Seat already reserved"
         )
+    return reservations.get_reservation_by_show_and_seat(
+        reservation.show_id, reservation.seat
+    )
 
 
 @router.put("/{previous_reservation_uuid}")
