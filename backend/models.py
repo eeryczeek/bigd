@@ -34,6 +34,7 @@ class MovieShow(BaseModel):
 
 
 class SeatReservation(BaseModel):
+    id: UUID | None = None
     show_id: UUID
     seat: Seat
     user_mail: str

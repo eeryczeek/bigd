@@ -2,7 +2,7 @@ DROP KEYSPACE IF EXISTS cinema;
 
 CREATE KEYSPACE IF NOT EXISTS cinema WITH replication = {
     'class': 'SimpleStrategy',
-    'replication_factor': 2
+    'replication_factor': 3
 };
 
 USE cinema;
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS movie_shows_by_movie (
     movie_title TEXT,
     room_name TEXT,
     show_time TIMESTAMP,
-    PRIMARY KEY (movie_title, show_id, show_time)
+    PRIMARY KEY (movie_title, show_time, show_id)
 ) WITH CLUSTERING ORDER BY (show_time ASC);
 
 CREATE TABLE IF NOT EXISTS movie_shows_by_id (
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS seats_by_show (
 );
 
 -- Reservations table
-CREATE TABLE IF NOT EXISTS seat_reservations (
+CREATE TABLE IF NOT EXISTS reservations (
     id UUID,
     show_id UUID,
     seat frozen<seat>,
@@ -68,7 +68,8 @@ CREATE TABLE IF NOT EXISTS reservations_by_id (
 
 CREATE TABLE IF NOT EXISTS reservations_by_user (
     user_mail TEXT,
+    id UUID,
     show_id UUID,
     seat frozen<seat>,
-    PRIMARY KEY (user_mail, show_id, seat)
+    PRIMARY KEY (user_mail, id)
 );

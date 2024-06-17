@@ -10,6 +10,11 @@ def get_cinema_room(cinema_room_name: str):
     return rooms.get_room_by_name(cinema_room_name)
 
 
+@router.get("")
+def get_all_cinema_rooms():
+    return rooms.get_rooms()
+
+
 @router.post("")
 def add_cinema_room(cinema_room: CinemaRoom):
     return rooms.create_room(cinema_room)

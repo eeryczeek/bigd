@@ -56,7 +56,16 @@ get_seats_by_show = session.prepare("SELECT * FROM seats_by_show WHERE show_id =
 
 def get_seats_for_show(show_uuid: uuid.UUID):
     rows = session.execute(get_seats_by_show, [show_uuid]).all()
-    return [Seat(**row.seat._asdict()) for row in rows]
+    return [Seat(**row.seat._asdict(), is_reserved=row.is_reserved) for row in rows]
+
+
+update_seat_query = session.prepare(
+    query="UPDATE seats_by_show SET is_reserved = ? WHERE show_id = ? AND seat = ?"
+)
+
+
+def update_seat(show_uuid: uuid.UUID, seat: Seat):
+    session.execute(update_seat_query, [seat.is_reserved, show_uuid, seat])
 
 
 create_show_by_id = session.prepare(
@@ -90,6 +99,7 @@ def create_show(show: MovieShow):
         ],
     )
     for seat in room.seats:
+        seat.is_reserved = False
         session.execute(
             create_seat,
             [new_show_id, seat],
@@ -100,7 +110,7 @@ delete_show_by_id = session.prepare("DELETE FROM movie_shows_by_id WHERE show_id
 
 
 delete_show_by_movie_id = session.prepare(
-    "DELETE FROM movie_shows_by_movie WHERE movie_title = ? AND show_time = ? AND room_name = ?"
+    "DELETE FROM movie_shows_by_movie WHERE movie_title = ? AND show_time = ? AND show_id = ?"
 )
 
 
@@ -108,5 +118,5 @@ def delete_show(show_uuid):
     show = get_show_by_id(show_uuid)
     session.execute(delete_show_by_id, [show_uuid])
     session.execute(
-        delete_show_by_movie_id, [show.movie_title, show.show_time, show.room_name]
+        delete_show_by_movie_id, [show.movie_title, show.show_time, show.show_id]
     )

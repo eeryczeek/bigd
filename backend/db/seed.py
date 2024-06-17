@@ -5,7 +5,7 @@ from db.connection import session
 from db.rooms import create_room
 from db.movies import create_movie
 from db.shows import create_show, get_shows, get_seats_for_show
-from db.reservations import create_reservation_for_show
+from db.reservations import create_reservation
 
 
 def insert_sample_data():
@@ -69,16 +69,19 @@ def insert_sample_data():
     seats = {show.show_id: get_seats_for_show(show.show_id) for show in shows}
     reservations = [
         SeatReservation(
+            id=uuid4(),
             show_id=shows[0].show_id,
             seat=seats[shows[0].show_id][1].copy(update={"is_reserved": True}),
             user_mail="user@mail.com",
         ),
         SeatReservation(
+            id=uuid4(),
             show_id=shows[1].show_id,
             seat=seats[shows[1].show_id][2].copy(update={"is_reserved": True}),
             user_mail="user2@mail.com",
         ),
         SeatReservation(
+            id=uuid4(),
             show_id=shows[2].show_id,
             seat=seats[shows[2].show_id][3].copy(update={"is_reserved": True}),
             user_mail="user3@mail.com",
@@ -86,7 +89,7 @@ def insert_sample_data():
     ]
 
     for reservation in reservations:
-        create_reservation_for_show(reservation)
+        create_reservation(reservation)
 
 
 def clean_up():
@@ -95,5 +98,7 @@ def clean_up():
     session.execute("TRUNCATE movie_shows_by_id")
     session.execute("TRUNCATE movie_shows_by_movie")
     session.execute("TRUNCATE seats_by_show")
-    session.execute("TRUNCATE seat_reservations")
+    session.execute("TRUNCATE reservations")
+    session.execute("TRUNCATE reservations_by_id")
+    session.execute("TRUNCATE reservations_by_user")
     session.execute("TRUNCATE reservations_by_user")
