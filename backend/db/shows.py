@@ -51,7 +51,8 @@ def get_show_by_id(show_uuid):
     )
 
 
-get_seats_by_show = session.prepare("SELECT * FROM seats_by_show WHERE show_id = ?")
+get_seats_by_show = session.prepare(
+    "SELECT * FROM seats_by_show WHERE show_id = ?")
 
 
 def get_seats_for_show(show_uuid: uuid.UUID):
@@ -108,7 +109,8 @@ def create_show(show: MovieShow):
         )
 
 
-delete_show_by_id = session.prepare("DELETE FROM movie_shows_by_id WHERE show_id = ?")
+delete_show_by_id = session.prepare(
+    "DELETE FROM movie_shows_by_id WHERE show_id = ?")
 
 
 delete_show_by_movie_id = session.prepare(
@@ -120,5 +122,6 @@ def delete_show(show_uuid):
     show = get_show_by_id(show_uuid)
     session.execute(delete_show_by_id, [show_uuid])
     session.execute(
-        delete_show_by_movie_id, [show.movie_title, show.show_time, show.show_id]
+        delete_show_by_movie_id, [
+            show.movie_title, show.show_time, show.show_id]
     )

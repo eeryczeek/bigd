@@ -8,13 +8,18 @@ import gevent
 class StressTest2(TaskSet):
     @ task
     def fetch_movie_shows(self):
-        for _ in range(5000):
+        for _ in range(3333):
             movieTitle = "Inception"
             self.client.get(f"/shows/{movieTitle}")
 
     @ task
+    def fetch_reservations(self):
+        for _ in range(3333):
+            self.client.get("/reservations")
+
+    @ task
     def fetch_cinema_room(self):
-        for _ in range(5000):
+        for _ in range(3333):
             cinemaRoomName = "Room 1"
             self.client.get(f"/rooms/{cinemaRoomName}")
 

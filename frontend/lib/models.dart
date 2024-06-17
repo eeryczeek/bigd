@@ -38,11 +38,13 @@ class CinemaRoom {
 }
 
 class Reservation {
+  final String uuid;
   String user;
   String movieShowUuid;
   Seat seat;
 
   Reservation({
+    required this.uuid,
     required this.user,
     required this.movieShowUuid,
     required this.seat,

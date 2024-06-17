@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:frontend/components/seat_widget.dart';
 import 'package:frontend/models.dart';
-import 'package:frontend/pages/movies_page.dart';
+import 'package:frontend/pages/reservation_page.dart';
 import 'package:frontend/services.dart';
 import 'package:intl/intl.dart';
 
@@ -171,12 +171,10 @@ class _SeatSelectionPageState extends State<SeatSelectionPage> {
                                 movieShowUuid: widget.movieShow.uuid,
                                 selectedSeats: selectedSeatsList);
 
-                            // Navigate to the new page
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      const MoviesPage(title: 'Movies')),
+                                  builder: (context) => ReservationsPage()),
                             );
                           },
                         ),

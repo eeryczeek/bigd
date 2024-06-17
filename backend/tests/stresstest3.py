@@ -1,44 +1,41 @@
-from locust import HttpUser, task, between, SequentialTaskSet, TaskSet, events
-from locust.env import Environment
-from locust.stats import stats_printer, stats_history
-from locust.log import setup_logging
-import gevent
+import requests
+import threading
+
+BASE_URL = "http://localhost:8000"
 
 
-class StressTest3(SequentialTaskSet):
-    @ task
-    def create_reservation(self):
-        response = self.client.get("/shows/Inception")
-        if response.status_code == 200:
-            movieShow = response.json()[0]
-            for _ in range(10000):
-                response = self.client.post(f"/reservations/{movieShow['show_id']}", json={
-                    "show_id": movieShow['show_id'],
-                    "seat": {"x": 1, "y": 1, "is_reserved": True},
-                    "user_mail": "user"
-                })
+def create_reservation1():
+    with requests.Session() as s:
+        movieShow = s.get(f"{BASE_URL}/shows/Inception").json()[0]
+        cinemaRoom = s.get(f"{BASE_URL}/rooms/{movieShow['room_name']}").json()
+        reservations = s.get(
+            f"{BASE_URL}/reservations/show/{movieShow['show_id']}").json()
+        available_seats = [
+            seat for seat in cinemaRoom['seats'] if seat not in reservations]
+        for seat in available_seats:
+            s.post(f"{BASE_URL}/reservations/{movieShow['show_id']}",
+                   json={"show_id": movieShow['show_id'], "seat": seat, "user_mail": "user1"}, headers={'Content-Type': 'application/json; charset=UTF-8'})
 
 
-class UserBehavior(HttpUser):
-    host = "http://localhost:8000"
-    wait_time = between(0, 0)
-    tasks = [StressTest3]
-
-
-def main():
-    setup_logging("INFO", None)
-
-    env = Environment(user_classes=[UserBehavior])
-    env.create_local_runner()
-
-    gevent.spawn(stats_printer(env.stats))
-    gevent.spawn(stats_history, env.runner)
-
-    env.runner.start(user_count=5, spawn_rate=1)
-
-    gevent.spawn_later(60, lambda: env.runner.quit())
-    env.runner.greenlet.join()
+def create_reservation2():
+    with requests.Session() as s:
+        movieShow = s.get(f"{BASE_URL}/shows/Inception").json()[0]
+        cinemaRoom = s.get(f"{BASE_URL}/rooms/{movieShow['room_name']}").json()
+        reservations = s.get(
+            f"{BASE_URL}/reservations/show/{movieShow['show_id']}").json()
+        available_seats = [
+            seat for seat in cinemaRoom['seats'] if seat not in reservations]
+        for seat in available_seats:
+            s.post(f"{BASE_URL}/reservations/{movieShow['show_id']}",
+                   json={"show_id": movieShow['show_id'], "seat": seat, "user_mail": "user2"}, headers={'Content-Type': 'application/json; charset=UTF-8'})
 
 
 if __name__ == "__main__":
-    main()
+    thread1 = threading.Thread(target=create_reservation1)
+    thread2 = threading.Thread(target=create_reservation2)
+
+    thread1.start()
+    thread2.start()
+
+    thread1.join()
+    thread2.join()

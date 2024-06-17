@@ -70,51 +70,53 @@ class _MovieCardState extends State<MovieCard> {
                       style: Theme.of(context).textTheme.bodyMedium,
                     );
                   } else {
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (context, index) {
-                        var show = snapshot.data![index];
-                        return MouseRegion(
-                          cursor: SystemMouseCursors.click,
-                          onHover: (_) {
-                            setState(() {
-                              hoverIndex = index;
-                            });
-                          },
-                          onExit: (_) {
-                            setState(() {
-                              hoverIndex = null;
-                            });
-                          },
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      SeatSelectionPage(movieShow: show),
-                                ),
-                              );
+                    return Expanded(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          var show = snapshot.data![index];
+                          return MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            onHover: (_) {
+                              setState(() {
+                                hoverIndex = index;
+                              });
                             },
-                            child: Container(
-                              padding: const EdgeInsets.all(8.0),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: hoverIndex == index
-                                      ? Theme.of(context).colorScheme.tertiary
-                                      : Colors.transparent,
-                                  width: 4,
+                            onExit: (_) {
+                              setState(() {
+                                hoverIndex = null;
+                              });
+                            },
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        SeatSelectionPage(movieShow: show),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(8.0),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: hoverIndex == index
+                                        ? Theme.of(context).colorScheme.tertiary
+                                        : Colors.transparent,
+                                    width: 4,
+                                  ),
                                 ),
-                              ),
-                              child: Text(
-                                DateFormat('EEE hh:mm').format(show.showTime),
-                                style: Theme.of(context).textTheme.bodyMedium,
+                                child: Text(
+                                  DateFormat('EEE hh:mm').format(show.showTime),
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     );
                   }
                 },

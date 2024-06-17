@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models.dart';
+import 'package:frontend/pages/reservation_page.dart';
 import 'package:frontend/services.dart';
 import 'package:frontend/components/movie_card.dart';
 
@@ -24,6 +25,16 @@ class _MoviesPageState extends State<MoviesPage> {
           style: Theme.of(context).textTheme.titleLarge,
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return ReservationsPage();
+              }));
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Padding(

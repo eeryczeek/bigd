@@ -10,7 +10,7 @@ from db.reservations import create_reservation
 
 def insert_sample_data():
     room_names = ["Room " + str(i) for i in range(1, 4)]
-    rows_by_columns_rooms = [(2, 3), (6, 4), (4, 5)]
+    rows_by_columns_rooms = [(2, 3), (6, 4), (16, 8)]
     for room_name, (rows, columns) in zip(room_names, rows_by_columns_rooms):
         seats = [
             Seat(x=i, y=j, is_reserved=False)
