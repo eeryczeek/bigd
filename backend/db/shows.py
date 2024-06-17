@@ -74,7 +74,9 @@ create_show_by_id = session.prepare(
 create_show_by_movie = session.prepare(
     "INSERT INTO movie_shows_by_movie (show_id, movie_title, room_name, show_time) VALUES (?, ?, ?, ?)"
 )
-create_seat = session.prepare("INSERT INTO seats_by_show (show_id, seat) VALUES (?, ?)")
+create_seat = session.prepare(
+    "INSERT INTO seats_by_show (show_id, seat, is_reserved) VALUES (?, ?, false)"
+)
 
 
 def create_show(show: MovieShow):
