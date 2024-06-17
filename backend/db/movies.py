@@ -8,12 +8,29 @@ get_movies_by_title_query = session.prepare("SELECT * FROM movies WHERE title = 
 
 def get_movies() -> List[Movie]:
     rows = session.execute(get_movies_query).all()
-    return [Movie(**row._asdict()) for row in rows]
+    return [
+        Movie(
+            title=row.title or "",
+            duration=row.duration or 0,
+            genres=row.genres or [],
+            rating=row.rating or 0.0,
+        )
+        for row in rows
+    ]
 
 
 def get_movie_by_title(title: str) -> Movie | None:
     row = session.execute(get_movies_by_title_query, [title]).one()
-    return Movie(**row._asdict()) if row else None
+    return (
+        Movie(
+            title=row.title or "",
+            duration=row.duration or 0,
+            genres=row.genres or [],
+            rating=row.rating or 0.0,
+        )
+        if row
+        else None
+    )
 
 
 create_movie_query = session.prepare(

@@ -10,9 +10,9 @@ class User(BaseModel):
 
 class Movie(BaseModel):
     title: str
-    duration: int
-    genres: List[str]
-    rating: float
+    duration: int = 0
+    genres: List[str] = []
+    rating: float = 0.0
 
 
 class Seat(BaseModel):
@@ -34,6 +34,7 @@ class MovieShow(BaseModel):
 
 
 class SeatReservation(BaseModel):
+    id: UUID | None = None
     show_id: UUID
     seat: Seat
     user_mail: str
