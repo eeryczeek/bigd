@@ -102,3 +102,4 @@ def clean_up():
     session.execute("TRUNCATE reservations_by_id")
     session.execute("TRUNCATE reservations_by_user")
     session.execute("TRUNCATE reservations_by_user")
+    session.shutdown()
