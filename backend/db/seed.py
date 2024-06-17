@@ -99,7 +99,4 @@ def clean_up():
     session.execute("TRUNCATE movie_shows_by_movie")
     session.execute("TRUNCATE seats_by_show")
     session.execute("TRUNCATE reservations")
-    session.execute("TRUNCATE reservations_by_id")
-    session.execute("TRUNCATE reservations_by_user")
-    session.execute("TRUNCATE reservations_by_user")
     session.shutdown()

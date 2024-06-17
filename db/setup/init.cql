@@ -59,17 +59,5 @@ CREATE TABLE IF NOT EXISTS reservations (
     PRIMARY KEY (show_id, seat)
 );
 
-CREATE TABLE IF NOT EXISTS reservations_by_id (
-    id UUID PRIMARY KEY,
-    show_id UUID,
-    user_mail TEXT,
-    seat frozen<seat>
-);
-
-CREATE TABLE IF NOT EXISTS reservations_by_user (
-    user_mail TEXT,
-    id UUID,
-    show_id UUID,
-    seat frozen<seat>,
-    PRIMARY KEY (user_mail, id)
-);
+CREATE INDEX IF NOT EXISTS ON reservations (user_mail);
+CREATE INDEX IF NOT EXISTS ON reservations (id);
