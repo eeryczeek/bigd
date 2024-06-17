@@ -29,6 +29,7 @@ def create_reservation(reservation: SeatReservation):
             reservation.seat,
             reservation.user_mail,
         ],
+        timeout=10,
     )
     if not res.was_applied:
         return False
@@ -140,13 +141,21 @@ def get_reservations_by_user(user_mail):
     return [SeatReservation(**row._asdict()) for row in rows]
 
 
+update_reservation_query = session.prepare(
+    query="UPDATE reservations SET user_mail = ? WHERE show_id = ? AND seat = ? IF EXISTS"
+)
+
+
 def update_reservation(
     previous_reservation_uuid: UUID, new_reservation: SeatReservation
 ) -> Tuple[bool, str | None]:
     previous_reservation = get_reservation_by_id(previous_reservation_uuid)
     if not previous_reservation:
         return False, "Reservation not found"
-    if create_reservation(new_reservation):
-        delete_reservation(previous_reservation_uuid)
+    res = session.execute(
+        update_reservation_query,
+        [new_reservation.user_mail, new_reservation.show_id, new_reservation.seat],
+    )
+    if res.was_applied:
         return True, None
     return False, "Seat already reserved"
